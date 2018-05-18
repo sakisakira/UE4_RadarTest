@@ -2,6 +2,12 @@
 
 #include "RadarComponent.h"
 
+URadarComponent::URadarComponent()
+{
 
+}
 
-
+float URadarComponent::Distance()
+{
+	return 0.0f;
+}
