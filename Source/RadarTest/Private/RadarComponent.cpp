@@ -39,9 +39,9 @@ float URadarComponent::ExtractDistance(const TArray<FLinearColor>& Colors) {
 }
 
 float URadarComponent::ExtractPower(const TArray<FLinearColor>& Colors) {
-  float TotalDistance = 0.f;
+  float TotalPower = 0.f;
   for (auto& Color : Colors)
-    TotalDistance = Color.B;
-  return TotalDistance / Colors.Num();
+    TotalPower += Color.B;
+  return TotalPower / Colors.Num();
 }
 
