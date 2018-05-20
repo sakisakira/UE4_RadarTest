@@ -21,4 +21,6 @@ class URadarComponent : public USceneCaptureComponent2D
  private:	
 	float ExtractDistance(const TArray<FLinearColor>& Colors) const;
 	float ExtractPower(const TArray<FLinearColor>& Colors) const;
+	TArray<FVector> ExtraceLocations(const TArray<FLinearColor>& Colors) const;
+	TArray<float> ExtracePowers(const TArray<FLinearColor>& Colors) const;
 };

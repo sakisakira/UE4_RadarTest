@@ -52,3 +52,15 @@ float URadarComponent::ExtractPower(const TArray<FLinearColor>& Colors) const {
   return TotalPower / Colors.Num();
 }
 
+TArray<FVector> URadarComponent::ExtraceLocations(const TArray<FLinearColor>& Colors) const {
+  //////////////////// working
+}
+
+TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors) const {
+  TArray<float> Powers;
+  Powers.Reserve(Colors.Num());
+  for (auto& Color : Colors) {
+    Powers.Add(Color.B);
+  }
+  return Powers;
+}
