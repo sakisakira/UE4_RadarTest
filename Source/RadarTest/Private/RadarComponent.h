@@ -19,6 +19,6 @@ class URadarComponent : public USceneCaptureComponent2D
 	  bool DistanceAndPower(float& Distance, float& Power);
 
  private:	
-	static float ExtractDistance(const TArray<FColor>& Colors);
-	static float ExtractPower(const TArray<FColor>& Colors);
+	float ExtractDistance(const TArray<FLinearColor>& Colors) const;
+	float ExtractPower(const TArray<FLinearColor>& Colors) const;
 };

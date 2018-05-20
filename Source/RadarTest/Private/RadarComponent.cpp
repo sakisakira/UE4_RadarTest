@@ -3,7 +3,7 @@
 
 URadarComponent::URadarComponent(void) : Super()
 {
-	bCaptureEveryFrame = false;
+	bCaptureEveryFrame = true;
 }
 
 bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
@@ -14,8 +14,11 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
   TextureTarget = NewObject<UTextureRenderTarget2D>(this);
   TextureTarget->InitAutoFormat(Resolution.X, Resolution.Y);
 
-  TextureTarget->OverrideFormat = EPixelFormat::PF_FloatRGBA;
-  TextureTarget->UpdateResourceImmediate(true);
+//  TextureTarget->OverrideFormat = EPixelFormat::PF_FloatRGBA;
+//  TextureTarget->UpdateResourceImmediate(true);
+
+//  auto RadarPPMaterial = LoadObject<UMaterial>(this, TEXT("Material'/Game/Radar_Mat.Radar_Mat'"));
+//  AddOrUpdateBlendable(RadarPPMaterial);
 
   CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 //  CaptureSource = ESceneCaptureSource::SCS_SceneDepth;
@@ -25,9 +28,12 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
   FTextureRenderTargetResource* RTResource
     = TextureTarget->GameThread_GetRenderTargetResource();
 
-  TArray<FColor> Colors;
-  const bool Result = RTResource->ReadPixels(Colors,
-	  ReadPixelFlags);
+  TArray<FLinearColor> Colors;
+  const bool Result 
+	  = RTResource->ReadLinearColorPixels(Colors, ReadPixelFlags);
+  TArray<FFloat16Color> depths;
+  const bool Result_
+	  = RTResource->ReadFloat16Pixels(depths);
 
   if (!Result || Colors.Num() == 0) {
     return false;
@@ -38,14 +44,14 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
   }
 }
 
-float URadarComponent::ExtractDistance(const TArray<FColor>& Colors) {
+float URadarComponent::ExtractDistance(const TArray<FLinearColor>& Colors) const {
   float TotalDistance = 0.f;
   for (auto& Color : Colors)
     TotalDistance += Color.R;
   return TotalDistance / Colors.Num();
 }
 
-float URadarComponent::ExtractPower(const TArray<FColor>& Colors) {
+float URadarComponent::ExtractPower(const TArray<FLinearColor>& Colors) const {
   float TotalPower = 0.f;
   for (auto& Color : Colors)
     TotalPower += Color.B;
