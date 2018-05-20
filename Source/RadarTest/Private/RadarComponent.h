@@ -4,7 +4,7 @@
 #include "Components/SceneCaptureComponent2D.h"
 #include "RadarComponent.generated.h"
 
-UCLASS(meta = (BlueprintSpawnableComponent))
+UCLASS(ClassGroup = Rendering, meta = (BlueprintSpawnableComponent))
 class URadarComponent : public USceneCaptureComponent2D
 {
 	GENERATED_BODY()
@@ -20,6 +20,6 @@ class URadarComponent : public USceneCaptureComponent2D
  private:	
 	UTextureRenderTarget2D* TextureTarget;
 
-	static float ExtractDistance(const TArray<FLinearColor>& Colors);
-	static float ExtractPower(const TArray<FLinearColor>& Colors);
+	static float ExtractDistance(const TArray<FColor>& Colors);
+	static float ExtractPower(const TArray<FColor>& Colors);
 };
