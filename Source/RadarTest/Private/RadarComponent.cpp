@@ -1,15 +1,21 @@
 #include "RadarComponent.h"
 #include "Runtime/Engine/Classes/Engine/TextureRenderTarget2D.h"
 
-URadarComponent::URadarComponent()
+URadarComponent::URadarComponent(void) : Super()
 {
-
+	bCaptureEveryFrame = false;
 }
 
 bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
 {
+	if (Resolution.X < 10) Resolution.X = 10;
+	if (Resolution.Y < 10) Resolution.Y = 10;
+
   TextureTarget = NewObject<UTextureRenderTarget2D>(this);
-  TextureTarget->InitAutoFormat(16, 16);
+  TextureTarget->InitAutoFormat(Resolution.X, Resolution.Y);
+
+  TextureTarget->OverrideFormat = EPixelFormat::PF_FloatRGBA;
+  TextureTarget->UpdateResourceImmediate(true);
 
   CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
 //  CaptureSource = ESceneCaptureSource::SCS_SceneDepth;
@@ -20,7 +26,8 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
     = TextureTarget->GameThread_GetRenderTargetResource();
 
   TArray<FColor> Colors;
-  const bool Result = RTResource->ReadPixels(Colors);
+  const bool Result = RTResource->ReadPixels(Colors,
+	  ReadPixelFlags);
 
   if (!Result || Colors.Num() == 0) {
     return false;

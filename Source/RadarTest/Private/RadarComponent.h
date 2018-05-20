@@ -17,9 +17,8 @@ class URadarComponent : public USceneCaptureComponent2D
 
 	UFUNCTION(BlueprintCallable, Category = "Radar")
 	  bool DistanceAndPower(float& Distance, float& Power);
- private:	
-	UTextureRenderTarget2D* TextureTarget;
 
+ private:	
 	static float ExtractDistance(const TArray<FColor>& Colors);
 	static float ExtractPower(const TArray<FColor>& Colors);
 };
