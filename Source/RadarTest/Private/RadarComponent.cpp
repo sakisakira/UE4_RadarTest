@@ -14,17 +14,13 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
   TextureTarget = NewObject<UTextureRenderTarget2D>(this);
   TextureTarget->InitAutoFormat(Resolution.X, Resolution.Y);
 
-//  TextureTarget->OverrideFormat = EPixelFormat::PF_FloatRGBA;
-//  TextureTarget->UpdateResourceImmediate(true);
-
-//  auto RadarPPMaterial = LoadObject<UMaterial>(this, TEXT("Material'/Game/Radar_Mat.Radar_Mat'"));
-//  AddOrUpdateBlendable(RadarPPMaterial);
+  auto RadarPPMaterial = LoadObject<UMaterial>(this, TEXT("Material'/Game/Radar_Mat.Radar_Mat'"));
+  AddOrUpdateBlendable(RadarPPMaterial);
 
   CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
-//  CaptureSource = ESceneCaptureSource::SCS_SceneDepth;
   CaptureScene();
 
-  FReadSurfaceDataFlags ReadPixelFlags(RCM_UNorm);
+  FReadSurfaceDataFlags ReadPixelFlags(RCM_MinMax);
   FTextureRenderTargetResource* RTResource
     = TextureTarget->GameThread_GetRenderTargetResource();
 
@@ -32,8 +28,6 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
   const bool Result 
 	  = RTResource->ReadLinearColorPixels(Colors, ReadPixelFlags);
   TArray<FFloat16Color> depths;
-  const bool Result_
-	  = RTResource->ReadFloat16Pixels(depths);
 
   if (!Result || Colors.Num() == 0) {
     return false;
