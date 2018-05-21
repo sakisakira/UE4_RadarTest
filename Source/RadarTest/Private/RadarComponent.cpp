@@ -6,13 +6,16 @@ URadarComponent::URadarComponent(void) : Super()
 	bCaptureEveryFrame = true;
 }
 
-bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
+bool URadarComponent::LocationsAndPowers(
+	TArray<FVector2D>& Locations,	TArray<float>& Powers)
 {
-	if (Resolution.X < 10) Resolution.X = 10;
-	if (Resolution.Y < 10) Resolution.Y = 10;
-
+	if (HCount < 10) HCount = 10;
+	if (HFoV < 10.f) HFoV = 10.f;
+	if (HFoV > 170.f) HFoV = 170.f;
+	
   TextureTarget = NewObject<UTextureRenderTarget2D>(this);
-  TextureTarget->InitAutoFormat(Resolution.X, Resolution.Y);
+  TextureTarget->InitAutoFormat(HCount, 1);
+  FOVAngle = HFoV;
 
   auto RadarPPMaterial = LoadObject<UMaterial>(this, TEXT("Material'/Game/Radar_Mat.Radar_Mat'"));
   AddOrUpdateBlendable(RadarPPMaterial);
@@ -29,31 +32,23 @@ bool URadarComponent::DistanceAndPower(float& Distance, float& Power)
 	  = RTResource->ReadLinearColorPixels(Colors, ReadPixelFlags);
   TArray<FFloat16Color> depths;
 
-  if (!Result || Colors.Num() == 0) {
+  if (!Result || Colors.Num() != HCount) {
     return false;
   } else {
-    Distance = ExtractDistance(Colors);
-    Power = ExtractPower(Colors);
+    Locations = ExtractLocations(Colors);
+    Powers = ExtractPowers(Colors);
 	return true;
   }
 }
 
-float URadarComponent::ExtractDistance(const TArray<FLinearColor>& Colors) const {
-  float TotalDistance = 0.f;
-  for (auto& Color : Colors)
-    TotalDistance += Color.R;
-  return TotalDistance / Colors.Num();
-}
-
-float URadarComponent::ExtractPower(const TArray<FLinearColor>& Colors) const {
-  float TotalPower = 0.f;
-  for (auto& Color : Colors)
-    TotalPower += Color.B;
-  return TotalPower / Colors.Num();
-}
-
-TArray<FVector> URadarComponent::ExtraceLocations(const TArray<FLinearColor>& Colors) const {
-  //////////////////// working
+TArray<FVector2D> URadarComponent::ExtractLocations(const TArray<FLinearColor>& Colors) const {
+	TArray<FVector2D> Locations;
+	Locations.SetNum(HCount);
+	for (int HIndex = 0; HIndex < HCount; HIndex++) {
+		const float Distance = Colors[HIndex].R;
+		Locations[HIndex] = LocationOf(HIndex, Distance);
+	}
+	return Locations;
 }
 
 TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors) const {
@@ -63,4 +58,9 @@ TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors)
     Powers.Add(Color.B);
   }
   return Powers;
+}
+
+FVector2D URadarComponent::LocationOf(const int HIndex, const float Distance) const {
+	const float ang = float(atan(2 * tan(HFoV * PI / 180 / 2) * (HIndex + 0.5) / HCount));
+	return FVector2D(Distance * cosf(ang), Distance * sinf(ang));
 }

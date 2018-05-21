@@ -13,14 +13,16 @@ class URadarComponent : public USceneCaptureComponent2D
 	URadarComponent();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Radar")
-	  FVector2D Resolution;
+		int32 HCount = 120;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Radar")
+		float HFoV = 120.f;
 
 	UFUNCTION(BlueprintCallable, Category = "Radar")
-	  bool DistanceAndPower(float& Distance, float& Power);
+	  bool LocationsAndPowers(TArray<FVector2D>& Locations, TArray<float>& Powers);
 
  private:	
-	float ExtractDistance(const TArray<FLinearColor>& Colors) const;
-	float ExtractPower(const TArray<FLinearColor>& Colors) const;
-	TArray<FVector> ExtraceLocations(const TArray<FLinearColor>& Colors) const;
-	TArray<float> ExtracePowers(const TArray<FLinearColor>& Colors) const;
+	TArray<FVector2D> ExtractLocations(const TArray<FLinearColor>& Colors) const;
+	TArray<float> ExtractPowers(const TArray<FLinearColor>& Colors) const;
+	FVector2D LocationOf(const int HIndex, const float Distance) const;
 };
