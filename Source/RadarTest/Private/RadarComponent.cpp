@@ -61,6 +61,7 @@ TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors)
 }
 
 FVector2D URadarComponent::LocationOf(const int HIndex, const float Distance) const {
-	const float ang = float(atan(2 * tan(HFoV * PI / 180 / 2) * (HIndex + 0.5) / HCount));
-	return FVector2D(Distance * cosf(ang), Distance * sinf(ang));
+	const float HRatio = 2.f * HIndex / HCount - 1.f;
+	const float ang = float(atan(tan(HFoV * PI / 180 / 2) * HRatio));
+	return FVector2D(Distance * sinf(ang), Distance * cosf(ang));
 }
