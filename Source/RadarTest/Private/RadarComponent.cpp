@@ -7,18 +7,18 @@ URadarComponent::URadarComponent(void) : Super()
 }
 
 bool URadarComponent::LocationsAndPowers(
-	TArray<FVector2D>& Locations,	TArray<float>& Powers)
-{
+	TArray<FVector2D>& Locations,	TArray<float>& Powers) {
 	if (HCount < 10) HCount = 10;
 	if (HFoV < 10.f) HFoV = 10.f;
 	if (HFoV > 170.f) HFoV = 170.f;
 	
-  TextureTarget = NewObject<UTextureRenderTarget2D>(this);
-  TextureTarget->InitAutoFormat(HCount, 1);
-  FOVAngle = HFoV;
+	TextureTarget = NewObject<UTextureRenderTarget2D>(this);
+	TextureTarget->InitAutoFormat(HCount, 1);
+	FOVAngle = HFoV;
 
-  auto RadarPPMaterial = LoadObject<UMaterial>(this, TEXT("Material'/Game/Radar_Mat.Radar_Mat'"));
-  AddOrUpdateBlendable(RadarPPMaterial);
+	auto RadarPPMaterial = LoadObject<UMaterial>(this,
+		TEXT("Material'/Game/RelativeLocation_Mat.RelativeLocation_Mat'"));
+	AddOrUpdateBlendable(RadarPPMaterial);
 
   CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
   CaptureScene();
@@ -30,7 +30,6 @@ bool URadarComponent::LocationsAndPowers(
   TArray<FLinearColor> Colors;
   const bool Result 
 	  = RTResource->ReadLinearColorPixels(Colors, ReadPixelFlags);
-  TArray<FFloat16Color> depths;
 
   if (!Result || Colors.Num() != HCount) {
     return false;
@@ -45,8 +44,9 @@ TArray<FVector2D> URadarComponent::ExtractLocations(const TArray<FLinearColor>& 
 	TArray<FVector2D> Locations;
 	Locations.SetNum(HCount);
 	for (int HIndex = 0; HIndex < HCount; HIndex++) {
-		const float Distance = Colors[HIndex].R;
-		Locations[HIndex] = LocationOf(HIndex, Distance);
+		Locations[HIndex].X = Colors[HIndex].R;
+		Locations[HIndex].Y = Colors[HIndex].G;
+		if (Colors[HIndex].B > 0.5f) Locations[HIndex].X *= -1;
 	}
 	return Locations;
 }
@@ -55,13 +55,8 @@ TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors)
   TArray<float> Powers;
   Powers.Reserve(Colors.Num());
   for (auto& Color : Colors) {
-    Powers.Add(Color.B);
+    Powers.Add(Color.A);
   }
   return Powers;
 }
 
-FVector2D URadarComponent::LocationOf(const int HIndex, const float Distance) const {
-	const float HRatio = 2.f * HIndex / HCount - 1.f;
-	const float ang = float(atan(tan(HFoV * PI / 180 / 2) * HRatio));
-	return FVector2D(Distance * sinf(ang), Distance * cosf(ang));
-}
