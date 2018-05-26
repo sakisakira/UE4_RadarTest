@@ -42,11 +42,11 @@ bool URadarComponent::LocationsAndPowers(
 
 TArray<FVector2D> URadarComponent::ExtractLocations(const TArray<FLinearColor>& Colors) const {
 	TArray<FVector2D> Locations;
+	const float RaiseValue = 10000.f;
 	Locations.SetNum(HCount);
 	for (int HIndex = 0; HIndex < HCount; HIndex++) {
-		Locations[HIndex].X = Colors[HIndex].R;
-		Locations[HIndex].Y = Colors[HIndex].G;
-		if (Colors[HIndex].B > 0.5f) Locations[HIndex].X *= -1;
+		Locations[HIndex].X = Colors[HIndex].G - RaiseValue;
+		Locations[HIndex].Y = Colors[HIndex].R - RaiseValue;
 	}
 	return Locations;
 }
