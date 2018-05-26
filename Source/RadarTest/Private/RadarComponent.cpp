@@ -53,9 +53,9 @@ TArray<FVector2D> URadarComponent::ExtractLocations(const TArray<FLinearColor>& 
 
 TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors) const {
   TArray<float> Powers;
-  Powers.Reserve(Colors.Num());
-  for (auto& Color : Colors) {
-    Powers.Add(Color.A);
+  Powers.SetNum(Colors.Num());
+  for (int HIndex = 0; HIndex < HCount; HIndex++) {
+	  Powers[HIndex] = Colors[HIndex].B;
   }
   return Powers;
 }
