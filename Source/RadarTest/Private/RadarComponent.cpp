@@ -7,7 +7,8 @@ URadarComponent::URadarComponent(void) : Super()
 }
 
 bool URadarComponent::LocationsAndPowers(
-	TArray<FVector2D>& Locations,	TArray<float>& Powers) {
+	TArray<FVector2D>& Locations,	TArray<float>& Powers) 
+{
 	if (HCount < 10) HCount = 10;
 	if (HFoV < 10.f) HFoV = 10.f;
 	if (HFoV > 170.f) HFoV = 170.f;
@@ -17,44 +18,51 @@ bool URadarComponent::LocationsAndPowers(
 	FOVAngle = HFoV;
 
 	auto RadarPPMaterial = LoadObject<UMaterial>(this,
-		TEXT("Material'/Game/RelativeLocation_Mat.RelativeLocation_Mat'"));
+		TEXT("Material'/Game/loc2d_pow_mat.loc2d_pow_mat'"));
 	AddOrUpdateBlendable(RadarPPMaterial);
 
-  CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
-  CaptureScene();
+	CaptureSource = ESceneCaptureSource::SCS_FinalColorLDR;
+	CaptureScene();
 
-  FReadSurfaceDataFlags ReadPixelFlags(RCM_MinMax);
-  FTextureRenderTargetResource* RTResource
-    = TextureTarget->GameThread_GetRenderTargetResource();
+	FReadSurfaceDataFlags ReadPixelFlags(RCM_MinMax);
+	FTextureRenderTargetResource* RTResource
+		= TextureTarget->GameThread_GetRenderTargetResource();
 
-  TArray<FLinearColor> Colors;
-  const bool Result 
-	  = RTResource->ReadLinearColorPixels(Colors, ReadPixelFlags);
+	TArray<FLinearColor> Colors;
+	const bool Result
+		= RTResource->ReadLinearColorPixels(Colors, ReadPixelFlags);
 
-  if (!Result || Colors.Num() != HCount) {
-    return false;
-  } else {
-    Locations = ExtractLocations(Colors);
-    Powers = ExtractPowers(Colors);
-	return true;
-  }
+	if (!Result || Colors.Num() != HCount) 
+	{
+		return false;
+	}
+	else
+	{
+		Locations = ExtractLocations(Colors);
+		Powers = ExtractPowers(Colors);
+		return true;
+	}
 }
 
-TArray<FVector2D> URadarComponent::ExtractLocations(const TArray<FLinearColor>& Colors) const {
+TArray<FVector2D> URadarComponent::ExtractLocations(const TArray<FLinearColor>& Colors) const 
+{
 	TArray<FVector2D> Locations;
 	const float RaiseValue = 10000.f;
 	Locations.SetNum(HCount);
-	for (int HIndex = 0; HIndex < HCount; HIndex++) {
+	for (int HIndex = 0; HIndex < HCount; HIndex++) 
+	{
 		Locations[HIndex].X = Colors[HIndex].G - RaiseValue;
 		Locations[HIndex].Y = Colors[HIndex].R - RaiseValue;
 	}
 	return Locations;
 }
 
-TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors) const {
+TArray<float> URadarComponent::ExtractPowers(const TArray<FLinearColor>& Colors) const 
+{
   TArray<float> Powers;
   Powers.SetNum(Colors.Num());
-  for (int HIndex = 0; HIndex < HCount; HIndex++) {
+  for (int HIndex = 0; HIndex < HCount; HIndex++) 
+  {
 	  Powers[HIndex] = Colors[HIndex].B;
   }
   return Powers;
