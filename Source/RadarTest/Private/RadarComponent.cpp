@@ -7,7 +7,7 @@ URadarComponent::URadarComponent(void) : Super()
 }
 
 bool URadarComponent::LocationsAndPowers(
-	TArray<FVector2D>& Locations,	TArray<float>& Powers) 
+	TArray<FVector2D>& Locations, TArray<float>& Powers) 
 {
 	if (HCount < 10) HCount = 10;
 	if (HFoV < 10.f) HFoV = 10.f;
